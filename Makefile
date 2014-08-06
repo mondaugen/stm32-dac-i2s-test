@@ -67,7 +67,7 @@ STM_DRIVER_DEP  = inc/stm32f4xx_conf.h inc/stm32f4xx.h $(wildcard $(STM_DRIVER_I
 
 CMSIS_PATH = $(HOME)/Documents/archives/CMSIS
 
-PROJ_INC_PATH = ./inc
+PROJ_INC_PATH = inc
 
 INC  = $(PROJ_INC_PATH) $(CMSIS_PATH)/Include $(STM_DRIVER_INC)
 
@@ -78,7 +78,7 @@ PROJ_OBJS = $(patsubst $(PROJ_SRCS_PATH)/%, objs/%, $(addsuffix .o, $(basename $
 PROJ_SRCS_ASM = $(wildcard $(PROJ_SRCS_PATH)/*.s)
 PROJ_OBJS_ASM = $(patsubst $(PROJ_SRCS_PATH)/%, objs/%, $(addsuffix .o, $(basename $(PROJ_SRCS_ASM))))
 
-PROJ_DEP = $(wildcard $(PROJ_INC_PATH/*.h))
+PROJ_DEP = $(wildcard $(PROJ_INC_PATH)/*.h)
 
 OBJS = $(STM_DRIVER_OBJS) $(PROJ_OBJS) $(PROJ_OBJS_ASM)
 
@@ -104,11 +104,11 @@ CC = arm-none-eabi-gcc
 OCD	= sudo openocd \
 		-f /usr/share/openocd/scripts/board/stm32f4discovery.cfg
 
-all: proj
+all: $(BIN)
 
 driver: $(STM_DRIVER_OBJS)
 
-proj: $(BIN)
+proj: $(PROJ_OBJS)
 
 # compile stm driver
 $(STM_DRIVER_OBJS): objs/%.o: $(STM_DRIVER_PATH)/src/%.c $(STM_DRIVER_DEP)
@@ -118,7 +118,7 @@ $(STM_DRIVER_OBJS): objs/%.o: $(STM_DRIVER_PATH)/src/%.c $(STM_DRIVER_DEP)
 $(PROJ_OBJS_ASM): objs/%.o: $(PROJ_SRCS_PATH)/%.s $(PROJ_DEP)
 	$(CC) -c $(CFLAGS) $< -o $@
 
-# compile c
+# compile c 
 $(PROJ_OBJS): objs/%.o: $(PROJ_SRCS_PATH)/%.c $(PROJ_DEP)
 	$(CC) -c $(CFLAGS) $< -o $@
 
@@ -134,3 +134,10 @@ flash: $(BIN)
 
 clean:
 	rm objs/*
+
+tags:
+	ctags -Ra . $(STM_DRIVER_PATH) $(CMSIS_PATH)
+
+print:
+	$(info $(PROJ_DEP))
+
