@@ -129,7 +129,7 @@ static void codec_i2s_clocks_setup(void)
     RCC_I2SCLKConfig(RCC_I2S2CLKSource_PLLI2S);
     RCC_PLLI2SCmd(ENABLE);
     /* wait until clock ready */
-    while (!RCC_GetFlagStatus(RCC_FLAG_PLLI2SRDY));
+    while (RCC_GetFlagStatus(RCC_FLAG_PLLI2SRDY) == RESET);
 }
 
 static void codec_i2s_dma_setup(void)
@@ -232,10 +232,10 @@ void codec_setup(void)
     codec_spi_setup();
     /* set up codec options (like datum size, gain etc.) */
     codec_setup_options();
-    /* setup I2S clocks */
-    codec_i2s_clocks_setup();
     /* setup I2S */
     codec_i2s_setup();
+    /* setup I2S clocks */
+    codec_i2s_clocks_setup();
     /* set up DMA for i2s communications */
     codec_i2s_dma_setup();
 }
